@@ -55,13 +55,22 @@ These are **local preview links**, not publicly hosted URLs. Pushing this reposi
 
 Open `http://127.0.0.1:8083/admin.html` on the computer running the server. The local preview restricts admin pages and APIs to loopback requests. An IP-based phone link to the admin page returns 403 by design. Do not remove this restriction for public hosting without implementing authenticated access.
 
+## Order desk features
+
+- Daily received/completed counts and confirmed order value, computed for the India calendar day across all stored orders. This value is not a payment-received report.
+- Date/channel/status/search filters, waiting-time display, oldest/newest sorting and clickable queue summaries.
+- Persistent internal staff notes, with unsaved drafts retained while switching orders or refreshing.
+- Selected-order print tickets and CSV export of the filtered list. Customer address/phone and internal notes are excluded from CSV. Formula-like cell values are escaped.
+- Pause/resume auto-refresh and retained last-loaded orders during connection errors.
+- The working list includes the latest 100 orders per channel; daily overview totals are computed separately across all orders for today.
+
 ## Checks
 
 ```sh
 python output/verify-restaurant.py
 ```
 
-This runs against an isolated temporary SQLite database. Add `--serve` to retain a disposable browser-QA server at `127.0.0.1:8085`. Browser workflows are in `output/playwright/verify-main-site.js` and `verify-delivery-recovery.js`.
+This runs against an isolated temporary SQLite database. Add `--serve` to retain a disposable browser-QA server at `127.0.0.1:8085`. Browser workflows are in `output/playwright/verify-main-site.js` and `verify-delivery-recovery.js`. The admin desk workflow is covered by `output/playwright/verify-admin-desk.js`.
 
 Validated locally: routing, canonical server prices, delivery validation, retry deduplication, status transitions and persistence, delivery/admin end-to-end flow, network-error recovery, portion selection, QR ordering, and responsive layouts.
 

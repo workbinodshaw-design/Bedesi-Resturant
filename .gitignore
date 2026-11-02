@@ -19,6 +19,7 @@ output/*
 output/playwright/*
 !output/playwright/verify-main-site.js
 !output/playwright/verify-delivery-recovery.js
+!output/playwright/verify-admin-desk.js
 
 # Superseded visual experiments; current menu uses WebP thumbnails.
 assets/bedesi-signature-platter.*

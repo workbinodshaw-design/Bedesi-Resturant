@@ -1,5 +1,5 @@
 import json,sqlite3,uuid,re,os
-from datetime import datetime,timezone
+from datetime import datetime,timezone,timedelta
 from contextlib import contextmanager
 from pathlib import Path
 from http.server import ThreadingHTTPServer,SimpleHTTPRequestHandler
@@ -77,12 +77,36 @@ class Handler(SimpleHTTPRequestHandler):
  def admin_orders(self):
   if not self.is_local_admin():self.reply(403,{'error':'The local admin panel is available only on the restaurant computer at http://127.0.0.1:'+str(self.server.server_port)+'/admin.html'});return
   with database() as db:
-   orders=[]
+   orders=[];today_orders=[]
+   local_now=datetime.now(timezone(timedelta(hours=5,minutes=30)))
+   start=local_now.replace(hour=0,minute=0,second=0,microsecond=0).astimezone(timezone.utc)
+   end=start+timedelta(days=1)
    for source,kind in [('orders','dine_in'),('delivery_orders','delivery')]:
     for payload,created in db.execute(f'SELECT payload,created_at FROM {source} ORDER BY rowid DESC LIMIT 100'):
      value=json.loads(payload);value['type']=kind;value.setdefault('createdAt',created.replace(' ','T')+'Z');orders.append(value)
+    for payload, in db.execute(f'SELECT payload FROM {source} WHERE datetime(created_at)>=datetime(?) AND datetime(created_at)<datetime(?)',(start.isoformat(),end.isoformat())):
+     today_orders.append(json.loads(payload))
   orders.sort(key=lambda o:o['createdAt'],reverse=True)
-  self.reply(200,{'orders':orders,'serverTime':now_iso()})
+  confirmed=[o for o in today_orders if o.get('status') in ('confirmed','preparing','out_for_delivery','delivered','served','completed')]
+  summary={'date':local_now.date().isoformat(),'received':len(today_orders),'confirmedValue':round(sum(o.get('total',0) for o in confirmed),2),'completed':sum(o.get('status') in ('delivered','completed') for o in today_orders)}
+  self.reply(200,{'orders':orders,'serverTime':now_iso(),'today':summary,'listLimitPerChannel':100})
+ def admin_note(self):
+  if not self.is_local_admin():self.reply(403,{'error':'Admin access requires the restaurant computer'});return
+  try:
+   data=self.read_json();kind=data.get('type');order_id=data.get('id');note=data.get('note')
+   if kind not in ('delivery','dine_in') or not isinstance(order_id,str) or not re.fullmatch(r'D?[A-F0-9]{8}',order_id):raise ValueError('Invalid order')
+   if not isinstance(note,str) or len(note)>1000:raise ValueError('Keep the staff note under 1,000 characters')
+   source='delivery_orders' if kind=='delivery' else 'orders'
+   with database() as db:
+    db.execute('BEGIN IMMEDIATE')
+    row=db.execute(f'SELECT payload,created_at FROM {source} WHERE id=?',(order_id,)).fetchone()
+    if not row:self.reply(404,{'error':'Order not found'});return
+    order=json.loads(row[0]);order.setdefault('createdAt',row[1].replace(' ','T')+'Z')
+    order['internalNote']=note.strip();order['internalNoteUpdatedAt']=now_iso()
+    db.execute(f'UPDATE {source} SET payload=? WHERE id=?',(json.dumps(order),order_id))
+   self.reply(200,{'order':{**order,'type':kind}})
+  except (ValueError,TypeError,KeyError,AttributeError) as error:self.reply(400,{'error':str(error)})
+  except sqlite3.Error:self.reply(503,{'error':'Unable to save the note. Please try again.'})
  def admin_status(self):
   if not self.is_local_admin():self.reply(403,{'error':'Admin access requires the restaurant computer'});return
   try:
@@ -92,9 +116,9 @@ class Handler(SimpleHTTPRequestHandler):
    transitions={'received':['confirmed','rejected'],'confirmed':['preparing','rejected'],'preparing':['out_for_delivery' if kind=='delivery' else 'served'],'out_for_delivery':['delivered'],'served':['completed']}
    with database() as db:
     db.execute('BEGIN IMMEDIATE')
-    row=db.execute(f'SELECT payload FROM {source} WHERE id=?',(order_id,)).fetchone()
+    row=db.execute(f'SELECT payload,created_at FROM {source} WHERE id=?',(order_id,)).fetchone()
     if not row:self.reply(404,{'error':'Order not found'});return
-    order=json.loads(row[0]);current=order.get('status','received')
+    order=json.loads(row[0]);order.setdefault('createdAt',row[1].replace(' ','T')+'Z');current=order.get('status','received')
     if status not in transitions.get(current,[]):raise ValueError('Order status changed. Refresh before taking this action')
     if kind=='delivery' and status=='confirmed':
      fee=data.get('deliveryFee')
@@ -124,6 +148,7 @@ class Handler(SimpleHTTPRequestHandler):
  def do_POST(self):
   if self.path=='/api/delivery/orders':self.delivery_order();return
   if self.path=='/api/admin/orders/status':self.admin_status();return
+  if self.path=='/api/admin/orders/note':self.admin_note();return
   if self.path not in ('/api/orders','/api/coupons/validate'):self.send_error(404);return
   try:
    origin=self.headers.get('Origin')

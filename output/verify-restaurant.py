@@ -55,13 +55,31 @@ with tempfile.TemporaryDirectory(prefix='bedesi-qa-') as temporary:
   assert call('/api/admin/orders/status',{**transition,'status':'rejected'})[0]==400
   table={'requestId':str(uuid.uuid4()),'table':'07','items':[{'id':dish['id'],'quantity':1}],'notes':'Isolated table-menu regression test','coupon':''}
   assert call('/api/orders',table)[0]==200
-  assert len(call('/api/admin/orders')[1]['orders'])==2
+  overview=call('/api/admin/orders')[1]
+  assert len(overview['orders'])==2
+  assert overview['today']['received']==2 and overview['today']['completed']==1
+  assert overview['today']['confirmedValue']==dish['price']*2+30
+  note={'type':'delivery','id':result['id'],'note':'Kitchen QA note <plain text>'}
+  assert call('/api/admin/orders/note',note)[0]==200
+  assert call('/api/admin/orders/note',{**note,'note':'x'*1001})[0]==400
+  assert call('/api/admin/orders/note',note,'https://unrelated.example')[0]==400
+  stored=next(o for o in call('/api/admin/orders')[1]['orders'] if o['id']==result['id'])
+  assert stored['internalNote']==note['note'] and stored['status']=='delivered'
   with closing(sqlite3.connect(app.DB)) as db:
    assert db.execute('SELECT COUNT(*) FROM delivery_orders').fetchone()[0]==1
    saved=json.loads(db.execute('SELECT payload FROM delivery_orders').fetchone()[0])
    assert saved['status']=='delivered' and len(saved['events'])==5
   print('PASS: routing, server prices, delivery validation, retry deduplication, origin checks, admin queue, status transitions, persistence and existing table-order API.',flush=True)
   if '--serve' in sys.argv:
+   # Explicit QA fixtures for date filtering and waiting-time display.
+   old=app.datetime.now(app.timezone.utc)-app.timedelta(days=1)
+   fixture={'id':'AA110001','table':'99','items':[{'id':dish['id'],'name':dish['name'],'quantity':1,'price':dish['price']}],'subtotal':dish['price'],'total':dish['price'],'status':'completed','createdAt':old.isoformat(),'notes':'Yesterday fixture in disposable QA database'}
+   with app.database() as db:
+    db.execute('INSERT INTO orders(id,request_id,payload,created_at) VALUES(?,?,?,?)',(fixture['id'],str(uuid.uuid4()),json.dumps(fixture),old.strftime('%Y-%m-%d %H:%M:%S')))
+    waiting=app.datetime.now(app.timezone.utc)-app.timedelta(minutes=45)
+    table_row=db.execute('SELECT id,payload FROM orders WHERE id!=?',(fixture['id'],)).fetchone()
+    table_payload=json.loads(table_row[1]);table_payload['createdAt']=waiting.isoformat()
+    db.execute('UPDATE orders SET payload=?,created_at=? WHERE id=?',(json.dumps(table_payload),waiting.strftime('%Y-%m-%d %H:%M:%S'),table_row[0]))
    print('Disposable browser-QA server: '+base,flush=True)
    threading.Event().wait()
  finally:
