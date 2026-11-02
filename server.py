@@ -117,7 +117,7 @@ class Handler(SimpleHTTPRequestHandler):
   if route=='/admin.html' and not self.is_local_admin():self.reply(403,{'error':'Open the admin panel on the restaurant computer using http://127.0.0.1:'+str(self.server.server_port)+'/admin.html'});return
   if route in ('/','/index.html') and parse_qs(parsed.query).get('table'):
    self.path='/table-menu.html'+('?' + parsed.query if parsed.query else '');route='/table-menu.html'
-  allowed={'/','/index.html','/home.html','/table-menu.html','/delivery.html','/admin.html','/website.css','/website.js','/restaurant-config.js','/delivery.css','/delivery.js','/admin.css','/admin.js','/robots.txt','/order.html','/style.css','/order-styles.css','/app.js','/order.js','/menu-data.js','/premium.css','/orders.html','/customer-orders.js','/customer-orders.css','/readability.css','/menu-header.css'}
+  allowed={'/pages-runtime.js','/admin-preview.html','/','/index.html','/home.html','/table-menu.html','/delivery.html','/admin.html','/website.css','/website.js','/restaurant-config.js','/delivery.css','/delivery.js','/admin.css','/admin.js','/robots.txt','/order.html','/style.css','/order-styles.css','/app.js','/order.js','/menu-data.js','/premium.css','/orders.html','/customer-orders.js','/customer-orders.css','/readability.css','/menu-header.css'}
   if route not in allowed and not (route.startswith('/assets/') and '..' not in route and Path(route).suffix in {'.svg','.png','.webp','.jpg','.ttf','.woff2','.woff'}):
    self.send_error(404);return
   super().do_GET()

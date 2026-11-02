@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  if(window.BEDESI_PAGES_PREVIEW)return;
   const $=selector=>document.querySelector(selector);
   const labels={received:'New request',confirmed:'Accepted',preparing:'Preparing',out_for_delivery:'Out for delivery',delivered:'Delivered',served:'Served',completed:'Completed',rejected:'Declined'};
   const active=['confirmed','preparing','out_for_delivery','served'],done=['delivered','completed','rejected'];

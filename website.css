@@ -35,3 +35,5 @@
 }
 @media(max-width:350px){.wrap{width:calc(100% - 28px)}.hero h1{font-size:43px}.hero-art{height:325px}.hero-photo-main{height:255px;left:16px}.hero-photo-small{height:165px}.hero .button{font-size:11px;padding-inline:13px;gap:14px}.flavour-strip .wrap{font-size:10px;gap:14px}.section-top h2{font-size:30px}.section-top .plain-link{max-width:92px;font-size:10px}.home-menu-tabs{margin-right:-14px;padding-right:14px}.home-dish h3{font-size:12px;min-height:37px}.dish-plus{width:34px;height:38px}.visit-copy{padding-inline:21px}.visit-actions{gap:13px}.visit-actions .button{font-size:11px}.visit-actions .plain-link{font-size:11px}.footer-top p{font-size:23px}.footer-top .button{font-size:11px;padding-inline:12px;gap:10px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
+
+.pages-preview-note{padding:12px 15px;background:#f3e8d8;border:1px solid #d7ac6266;border-radius:10px;color:#102443;font:600 12px/1.7 var(--body);margin:18px 0}

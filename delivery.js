@@ -56,7 +56,7 @@
   $('#delivery-continue').onclick=()=>{$('#delivery-checkout').hidden=false;$('#basket-bill').hidden=true;$('#delivery-checkout [name=name]').focus();};
   $('#back-to-basket').onclick=()=>{$('#delivery-checkout').hidden=true;renderBasket();};
   $('#delivery-checkout').addEventListener('submit',async event=>{
-    event.preventDefault();if(busy||!cart.size)return;
+    event.preventDefault();if(window.BEDESI_PAGES_PREVIEW||busy||!cart.size)return;
     const data=Object.fromEntries(new FormData(event.currentTarget));
     const payload={customer:data,items:[...cart].map(([id,quantity])=>({id,quantity}))};
     const fingerprint=JSON.stringify(payload);

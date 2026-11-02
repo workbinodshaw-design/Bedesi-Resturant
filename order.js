@@ -73,7 +73,7 @@ window.addEventListener('pageshow', event => {
 
 let placing=false;
 $('#place-order').addEventListener('click',async()=>{
- if(placing||couponBusy||!cart.size)return;
+ if(window.BEDESI_PAGES_PREVIEW||placing||couponBusy||!cart.size)return;
  placing=true;const button=$('#place-order');button.disabled=true;button.textContent='Placing order…';$('#place-error').hidden=true;
  try{
   let requestId=sessionStorage.getItem(key+'-request');if(!requestId){requestId=makeRequestId();sessionStorage.setItem(key+'-request',requestId);}
@@ -104,7 +104,7 @@ $('#coupon-toggle').addEventListener('click',()=>{const panel=$('#coupon-panel')
 function clearCoupon(){appliedCoupon='';couponDiscount=0;$('#coupon-message').textContent='';$('#coupon-remove').hidden=true;$('#bill-discount').hidden=true;}
 $('#coupon-remove').onclick=()=>{clearCoupon();$('#coupon-message').textContent='Coupon removed.';try{sessionStorage.removeItem(key+'-request');}catch{}renderOrder();};
 $('#coupon-panel').addEventListener('submit',async event=>{
- event.preventDefault();if(couponBusy||placing||!cart.size)return;
+ event.preventDefault();if(window.BEDESI_PAGES_PREVIEW||couponBusy||placing||!cart.size)return;
  const code=$('#coupon-input').value.trim().toUpperCase();if(!code){$('#coupon-message').textContent='Enter a coupon code first.';return;}
  couponBusy=true;$('#coupon-apply').disabled=true;$('#coupon-apply').textContent='Checking…';$('#place-order').disabled=true;
  const snapshot=JSON.stringify([...cart]);

@@ -4,6 +4,14 @@ Restaurant website, home-delivery requests, table QR menu, and a local order-man
 
 The main website uses Navy `#102443`, Ivory `#FBF6ED`, Terracotta `#C94F1D` and Brass `#D7AC62`, local Fraunces/Jakarta fonts, restaurant-menu photography, and the supplied interior photo.
 
+## Public GitHub Pages website
+
+- Homepage: https://workbinodshaw-design.github.io/Bedesi-Resturant/
+- Menu preview: https://workbinodshaw-design.github.io/Bedesi-Resturant/delivery.html
+- Table 07 QR preview: https://workbinodshaw-design.github.io/Bedesi-Resturant/?table=07
+
+The GitHub Pages deployment is a static website/menu preview. It does not submit orders, collect checkout details, or expose the local admin database. Checkout is explicitly disabled there; the Python-backed flows below remain available locally.
+
 ## Run
 
 Python 3 is required. The application uses only Python's standard library; no npm installation is needed.

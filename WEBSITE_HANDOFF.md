@@ -28,10 +28,12 @@ Checked: homepage menu discovery, delivery search/cart/checkout, delivery-to-adm
 
 ## Before public launch
 
-This is a local implementation, not a deployed/indexed Google result. Production needs hosting/domain/HTTPS, authenticated admin access, durable storage/backups, restaurant delivery operations and confirmed street address/coverage. Replace the loopback admin restriction with an authenticated production access model before enabling remote administration. No public-indexing or live-fulfillment claim has been made.
+GitHub Pages serves a public static website/menu preview. Python ordering/admin remain local; Google indexing has not been verified. Production needs hosting/domain/HTTPS, authenticated admin access, durable storage/backups, restaurant delivery operations and confirmed street address/coverage. Replace the loopback admin restriction with an authenticated production access model before enabling remote administration. No public-indexing or live-fulfillment claim has been made.
 
 The user-supplied interior photograph is saved at `assets/bedesi-kokrajhar-interior.png` and used in the contact/visit section. Primary action orange is #bc4c16; navy text is #152841; page ivory is #fffaf3. The QR table-menu palette remains separate.
 
 Final user-approved exact palette: Navy #102443, Ivory #FBF6ED, Terracotta #C94F1D and Brass gold #D7AC62. This supersedes the approximate colours above.
 
 Typography/design refinement: consolidated `website.css`; local Fraunces 700 for restaurant headings and Jakarta 500/600/700 for readable body/UI text. Menu discovery now uses underline selection and larger add actions; the delivery explainer uses navy with ivory text. Homepage and delivery layouts checked at 320, 393, 768, 1024 and 1440px without horizontal overflow.
+
+GitHub Pages uses `pages-runtime.js` to preserve project-subdirectory links and QR redirects. Public checkout is disabled explicitly, and the public admin URL opens a status page without order data. Local Python-backed functionality remains enabled.
