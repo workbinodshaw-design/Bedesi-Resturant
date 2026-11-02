@@ -15,6 +15,7 @@ __pycache__/
 output/*
 !output/verify-restaurant.py
 !output/verify-pages.cjs
+!output/verify-public-api.py
 !output/playwright/
 output/playwright/*
 !output/playwright/verify-main-site.js

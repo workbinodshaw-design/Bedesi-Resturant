@@ -4,13 +4,15 @@ Restaurant website, home-delivery requests, table QR menu, and a local order-man
 
 The main website uses Navy `#102443`, Ivory `#FBF6ED`, Terracotta `#C94F1D` and Brass `#D7AC62`, local Fraunces/Jakarta fonts, restaurant-menu photography, and the supplied interior photo.
 
-## Public GitHub Pages website
+## Public GitHub Pages website and connected ordering
 
 - Homepage: https://workbinodshaw-design.github.io/Bedesi-Resturant/
-- Menu preview: https://workbinodshaw-design.github.io/Bedesi-Resturant/delivery.html
-- Table 07 QR preview: https://workbinodshaw-design.github.io/Bedesi-Resturant/?table=07
+- Delivery menu: https://workbinodshaw-design.github.io/Bedesi-Resturant/delivery.html
+- Table 07 QR menu: https://workbinodshaw-design.github.io/Bedesi-Resturant/?table=07
 
-The GitHub Pages deployment is a static website/menu preview. It does not submit orders, collect checkout details, or expose the local admin database. Checkout is explicitly disabled there; the Python-backed flows below remain available locally.
+The GitHub-hosted frontend is connected to the order-only HTTPS API configured in `order-api-config.js`. Table and delivery orders are saved in the restaurant computer's SQLite database and appear in its private admin desk. This connection requires the computer, internet, API listener and Cloudflare tunnel to stay running. The public tunnel does not serve admin APIs, static files or database files.
+
+The public API listener is `python public_api.py --port 8086`. It binds only to loopback, accepts order submissions from the configured GitHub origin, and supports CORS preflight. Run the official `cloudflared tunnel --url http://127.0.0.1:8086 --no-autoupdate` to connect it. If a new tunnel hostname is issued, update `order-api-config.js` and push it to GitHub. The tunnel URL is not an admin credential.
 
 ## Run
 
@@ -68,6 +70,8 @@ Open `http://127.0.0.1:8083/admin.html` on the computer running the server. The 
 
 ```sh
 python output/verify-restaurant.py
+python output/verify-public-api.py
+node output/verify-pages.cjs
 ```
 
 This runs against an isolated temporary SQLite database. Add `--serve` to retain a disposable browser-QA server at `127.0.0.1:8085`. Browser workflows are in `output/playwright/verify-main-site.js` and `verify-delivery-recovery.js`. The admin desk workflow is covered by `output/playwright/verify-admin-desk.js`.

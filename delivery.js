@@ -56,14 +56,14 @@
   $('#delivery-continue').onclick=()=>{$('#delivery-checkout').hidden=false;$('#basket-bill').hidden=true;$('#delivery-checkout [name=name]').focus();};
   $('#back-to-basket').onclick=()=>{$('#delivery-checkout').hidden=true;renderBasket();};
   $('#delivery-checkout').addEventListener('submit',async event=>{
-    event.preventDefault();if(window.BEDESI_PAGES_PREVIEW||busy||!cart.size)return;
+    event.preventDefault();if(busy||!cart.size)return;
     const data=Object.fromEntries(new FormData(event.currentTarget));
     const payload={customer:data,items:[...cart].map(([id,quantity])=>({id,quantity}))};
     const fingerprint=JSON.stringify(payload);
     if(!lastRequest||lastRequest.fingerprint!==fingerprint)lastRequest={fingerprint,id:requestId()};
     busy=true;$('#delivery-submit').disabled=true;$('#delivery-submit').textContent='Sending your order…';$('#delivery-error').hidden=true;
     try{
-      const response=await fetch('/api/delivery/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,requestId:lastRequest.id})});
+      const response=await BedesiApi.request('/api/delivery/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,requestId:lastRequest.id})});
       const result=await response.json();if(!response.ok)throw Error(result.error||'Unable to send your order. Please try again.');
       $('#delivery-checkout').hidden=true;$('#basket-bill').hidden=true;$('#delivery-basket-items').replaceChildren();$('#delivery-confirmation').hidden=false;$('#delivery-reference').textContent=`#${result.id}`;
       cart.clear();lastRequest=null;$('#delivery-checkout').reset();renderBasket();

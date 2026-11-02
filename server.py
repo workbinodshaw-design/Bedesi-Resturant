@@ -31,9 +31,10 @@ def coupon_quote(subtotal,code,rules):
  return {'subtotal':subtotal,'discount':max(0,discount),'total':round(subtotal-max(0,discount),2),'coupon':code}
 class Handler(SimpleHTTPRequestHandler):
  def is_local_admin(self):return self.client_address[0] in ('127.0.0.1','::1')
+ def origin_allowed(self,origin):return origin=='http://'+self.headers.get('Host','')
  def read_json(self):
   origin=self.headers.get('Origin')
-  if origin and origin!='http://'+self.headers.get('Host',''):raise ValueError('Request origin is not allowed')
+  if origin and not self.origin_allowed(origin):raise ValueError('Request origin is not allowed')
   if self.headers.get_content_type()!='application/json':raise ValueError('Send JSON data')
   size=int(self.headers.get('Content-Length','0'))
   if not 1<=size<=20000:raise ValueError('Invalid request size')
@@ -141,7 +142,7 @@ class Handler(SimpleHTTPRequestHandler):
   if route=='/admin.html' and not self.is_local_admin():self.reply(403,{'error':'Open the admin panel on the restaurant computer using http://127.0.0.1:'+str(self.server.server_port)+'/admin.html'});return
   if route in ('/','/index.html') and parse_qs(parsed.query).get('table'):
    self.path='/table-menu.html'+('?' + parsed.query if parsed.query else '');route='/table-menu.html'
-  allowed={'/pages-runtime.js','/admin-preview.html','/','/index.html','/home.html','/table-menu.html','/delivery.html','/admin.html','/website.css','/website.js','/restaurant-config.js','/delivery.css','/delivery.js','/admin.css','/admin.js','/robots.txt','/order.html','/style.css','/order-styles.css','/app.js','/order.js','/menu-data.js','/premium.css','/orders.html','/customer-orders.js','/customer-orders.css','/readability.css','/menu-header.css'}
+  allowed={'/api-client.js','/order-api-config.js','/pages-runtime.js','/admin-preview.html','/','/index.html','/home.html','/table-menu.html','/delivery.html','/admin.html','/website.css','/website.js','/restaurant-config.js','/delivery.css','/delivery.js','/admin.css','/admin.js','/robots.txt','/order.html','/style.css','/order-styles.css','/app.js','/order.js','/menu-data.js','/premium.css','/orders.html','/customer-orders.js','/customer-orders.css','/readability.css','/menu-header.css'}
   if route not in allowed and not (route.startswith('/assets/') and '..' not in route and Path(route).suffix in {'.svg','.png','.webp','.jpg','.ttf','.woff2','.woff'}):
    self.send_error(404);return
   super().do_GET()
@@ -152,7 +153,7 @@ class Handler(SimpleHTTPRequestHandler):
   if self.path not in ('/api/orders','/api/coupons/validate'):self.send_error(404);return
   try:
    origin=self.headers.get('Origin')
-   if origin and origin != 'http://'+self.headers.get('Host',''):raise ValueError('Invalid origin')
+   if origin and not self.origin_allowed(origin):raise ValueError('Invalid origin')
    size=int(self.headers.get('Content-Length','0'))
    if size<1 or size>12000:raise ValueError('Invalid request size')
    data=json.loads(self.rfile.read(size));table=str(data.get('table',''))

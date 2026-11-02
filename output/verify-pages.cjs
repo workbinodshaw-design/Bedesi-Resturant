@@ -13,10 +13,21 @@ assert.equal(qr.redirects[0],'https://workbinodshaw-design.github.io/Bedesi-Rest
 const admin=run('workbinodshaw-design.github.io','/Bedesi-Resturant/admin.html');
 assert.equal(admin.redirects[0],'https://workbinodshaw-design.github.io/Bedesi-Resturant/admin-preview.html');
 const home=run('workbinodshaw-design.github.io','/Bedesi-Resturant/');
-assert.equal(home.window.BEDESI_PAGES_PREVIEW,true);
+assert.equal(home.window.BEDESI_PAGES_PREVIEW,undefined);
 home.events.DOMContentLoaded();
-let prevented=false,stopped=false;
-home.events.submit({target:{matches:()=>true},preventDefault:()=>prevented=true,stopImmediatePropagation:()=>stopped=true});
-assert.ok(prevented&&stopped);
-for(const name of ['index.html','delivery.html','table-menu.html','order.html','orders.html','admin.html'])assert.ok(fs.readFileSync(name,'utf8').includes('pages-runtime.js'));
-console.log('PASS: Pages-only activation, QR redirect, admin isolation, submit blocking and entry-point integration.');
+assert.equal(home.events.submit,undefined);
+assert.equal(home.events.click,undefined);
+for(const name of ['order.html','delivery.html']){
+ const html=fs.readFileSync(name,'utf8');assert.ok(html.includes('api-client.js')&&html.includes('order-api-config.js'));
+}
+const client=fs.readFileSync('api-client.js','utf8');
+(async()=>{
+ for(const hosted of [true,false]){
+  const calls=[],window={BEDESI_ORDER_API:'https://orders.example.test'};
+  vm.runInNewContext(client,{window,location:{hostname:hosted?'workbinodshaw-design.github.io':'127.0.0.1'},AbortController,setTimeout,clearTimeout,fetch:async(url)=>{calls.push(url);return {status:200};}});
+  await window.BedesiApi.request('/api/orders',{method:'POST'});
+  assert.equal(calls[0],hosted?'https://orders.example.test/api/orders':'/api/orders');
+  await assert.rejects(()=>window.BedesiApi.request('/api/admin/orders'));
+ }
+ console.log('PASS: QR redirects, private admin, active ordering, hosted/local API routing and public route allowlist.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

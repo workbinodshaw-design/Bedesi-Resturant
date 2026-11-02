@@ -1,6 +1,6 @@
 (() => {
  'use strict';
- if(window.BEDESI_PAGES_PREVIEW)return;
+ if(location.hostname.endsWith('.github.io'))return;
  const $=s=>document.querySelector(s);
  const labels={received:'New request',confirmed:'Accepted',preparing:'Preparing',out_for_delivery:'Out for delivery',delivered:'Delivered',served:'Served',completed:'Completed',rejected:'Declined'};
  const money=n=>`₹${Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}`;

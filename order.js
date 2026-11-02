@@ -73,11 +73,11 @@ window.addEventListener('pageshow', event => {
 
 let placing=false;
 $('#place-order').addEventListener('click',async()=>{
- if(window.BEDESI_PAGES_PREVIEW||placing||couponBusy||!cart.size)return;
+ if(placing||couponBusy||!cart.size)return;
  placing=true;const button=$('#place-order');button.disabled=true;button.textContent='Placing order…';$('#place-error').hidden=true;
  try{
   let requestId=sessionStorage.getItem(key+'-request');if(!requestId){requestId=makeRequestId();sessionStorage.setItem(key+'-request',requestId);}
-  const response=await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table,items:[...cart].map(([id,quantity])=>({id,quantity,notes:itemNotes[id]||''})),notes:$('#order-notes').value,coupon:appliedCoupon,requestId})});
+  const response=await BedesiApi.request('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table,items:[...cart].map(([id,quantity])=>({id,quantity,notes:itemNotes[id]||''})),notes:$('#order-notes').value,coupon:appliedCoupon,requestId})});
   const result=await response.json();if(!response.ok){$('#coupon-message').textContent=result.error||'Please check your order.';if(appliedCoupon){clearCoupon();renderOrder();}throw Error(result.error||'Unable to place order. Please try again.');}
   $('#confirmation-number').textContent=`Order #${result.id} · Table ${table}`;
   $('#confirmation-items').replaceChildren(...Array.from($('#order-items').children).map(node=>node.cloneNode(true)));
@@ -104,12 +104,12 @@ $('#coupon-toggle').addEventListener('click',()=>{const panel=$('#coupon-panel')
 function clearCoupon(){appliedCoupon='';couponDiscount=0;$('#coupon-message').textContent='';$('#coupon-remove').hidden=true;$('#bill-discount').hidden=true;}
 $('#coupon-remove').onclick=()=>{clearCoupon();$('#coupon-message').textContent='Coupon removed.';try{sessionStorage.removeItem(key+'-request');}catch{}renderOrder();};
 $('#coupon-panel').addEventListener('submit',async event=>{
- event.preventDefault();if(window.BEDESI_PAGES_PREVIEW||couponBusy||placing||!cart.size)return;
+ event.preventDefault();if(couponBusy||placing||!cart.size)return;
  const code=$('#coupon-input').value.trim().toUpperCase();if(!code){$('#coupon-message').textContent='Enter a coupon code first.';return;}
  couponBusy=true;$('#coupon-apply').disabled=true;$('#coupon-apply').textContent='Checking…';$('#place-order').disabled=true;
  const snapshot=JSON.stringify([...cart]);
  try{
-  const response=await fetch('/api/coupons/validate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table,items:[...cart].map(([id,quantity])=>({id,quantity,notes:itemNotes[id]||''})),coupon:code})});
+  const response=await BedesiApi.request('/api/coupons/validate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table,items:[...cart].map(([id,quantity])=>({id,quantity,notes:itemNotes[id]||''})),coupon:code})});
   const result=await response.json();
   if(snapshot!==JSON.stringify([...cart])){$('#coupon-message').textContent='Your cart changed. Apply the code again.';return;}
   if(!response.ok){clearCoupon();$('#coupon-message').textContent=result.error||'This coupon is not available.';renderOrder();return;}
