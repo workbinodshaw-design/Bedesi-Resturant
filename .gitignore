@@ -1,0 +1,34 @@
+# Local restaurant data and secrets
+*.sqlite3
+*.sqlite3-*
+*.sqlite
+*.db
+.env
+.env.*
+!.env.example
+
+# Python, browser sessions and generated previews
+__pycache__/
+*.py[cod]
+.playwright-cli/
+*.log
+output/*
+!output/verify-restaurant.py
+!output/playwright/
+output/playwright/*
+!output/playwright/verify-main-site.js
+!output/playwright/verify-delivery-recovery.js
+
+# Superseded visual experiments; current menu uses WebP thumbnails.
+assets/bedesi-signature-platter.*
+assets/biryani-cutout.*
+assets/butter-chicken-cutout.*
+assets/paneer-tikka-cutout.*
+assets/photo-*.jpg
+assets/restaurant-interior.png
+assets/bedesi-logo-green.svg
+assets/ARTWORK.md
+assets/menu/*.jpg
+!assets/menu/1301715394.jpg
+!assets/menu/1301715151.jpg
+!assets/menu/1301715145.jpg

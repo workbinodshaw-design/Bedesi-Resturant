@@ -1,0 +1,143 @@
+/* Bedesi menu: compact, aligned controls with a soft lavender accent. */
+:root { --header-height: 58px; }
+.menu-header {
+  --header-height: 58px;
+  height: 106px;
+  top: -48px;
+  padding: 8px 0;
+}
+.menu-header .context-strip {
+  height: 32px;
+  min-height: 32px;
+  margin-bottom: 10px;
+}
+.menu-header .brand-logo svg { width: 30px; height: 30px; }
+.menu-header .context-strip .brand-logo { font-size: 25px !important; gap: 8px; }
+.menu-header .table-marker {
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: #f5effc;
+  border-color: #e2d5f1;
+  color: #6a527f;
+  box-shadow: none;
+}
+.menu-header .table-marker b { color: #493258; font-size: 12px; }
+.menu-header .search-toolbar { height: 48px; gap: 10px; }
+.menu-header .toolbar-menu {
+  width: 42px;
+  height: 48px;
+  border: 1px solid #e7dff0;
+  background: #faf7fe;
+  border-radius: 13px;
+  color: #574167;
+}
+.menu-header .toolbar-menu svg { width: 21px; height: 21px; }
+.menu-header .search {
+  height: 48px;
+  border: 1px solid #e4dbea;
+  border-radius: 14px;
+  padding: 0 80px 0 13px;
+  gap: 9px;
+  background: #faf8fd;
+  box-shadow: none;
+}
+.menu-header .search > span { display: grid; place-items: center; flex: none; }
+.menu-header .search > span svg { width: 19px; height: 19px; color: #82708f; }
+.menu-header .search input { height: 46px; padding: 10px 0; font-size: 16px; color: #382b44; }
+.menu-header .search input::placeholder { font-size: 14px; color: #7a6c85; }
+.menu-header .filter-button {
+  width: 40px;
+  height: 40px;
+  top: 3px;
+  right: 3px;
+  border-radius: 10px;
+  background: #3e304d;
+  box-shadow: 0 2px 4px #3e304d16;
+}
+.menu-header .filter-button svg { width: 20px; height: 20px; }
+.menu-header .search #clear-search { width: 32px; height: 40px; top: 3px; right: 44px; }
+.menu-header .search:focus-within { border-color: #b397ce; box-shadow: 0 0 0 3px #b397ce20; }
+.diet-modes { display: flex; flex-wrap: wrap; gap: 8px; padding: 6px 0 10px; }
+.diet-modes button {
+  min-height: 40px;
+  padding: 8px 14px;
+  gap: 8px;
+  border: 1px solid #e8e0ef;
+  border-radius: 12px;
+  background: #fff;
+  color: #65546f;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  box-shadow: none;
+}
+.diet-modes button.active {
+  background: #eee5fa;
+  border-color: #cbb4e7;
+  color: #64428a;
+  box-shadow: inset 0 0 0 1px #ffffff70;
+}
+.diet-modes .diet-dot { width: 7px; height: 7px; flex: none; }
+.menu-header button:focus-visible, .diet-modes button:focus-visible { outline: 3px solid #b397ce; outline-offset: 3px; }
+@media (hover: hover) {
+  .menu-header .toolbar-menu:hover, .diet-modes button:not(.active):hover { background: #f4eefb; border-color: #cdb8df; }
+  .menu-header .filter-button:hover { background: #584068; }
+}
+@media (max-width: 350px) {
+  .menu-header .search-toolbar { gap: 8px; }
+  .menu-header .toolbar-menu { width: 38px; }
+  .menu-header .search { padding-left: 10px; gap: 7px; }
+  .diet-modes { gap: 6px; }
+  .diet-modes button { padding-inline: 11px; }
+}
+
+/* A unified lavender header and food-preference rail. */
+.menu-header {
+  padding: 8px 10px;
+  background: #f0e8fa;
+  border-radius: 0 0 18px 18px;
+  box-shadow: inset 0 -1px 0 #e4d6f2;
+}
+.menu-header .context-strip { margin-bottom: 10px; }
+.menu-header .context-strip .brand-logo { color: #463050; }
+.menu-header .table-marker { background: #fff; border-color: #dfcdef; color: #705184; }
+.menu-header .toolbar-menu { border-color: #dac8e9; background: #fff; color: #73518d; }
+.menu-header .search { background: #fff; border-color: #dac8e9; }
+.menu-header .filter-button { background: #755195; box-shadow: none; }
+.menu-header .search input::placeholder { color: #7b6b86; }
+.diet-modes {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr 1.25fr;
+  gap: 4px;
+  margin: 12px 0 10px;
+  padding: 5px;
+  background: #f5f0fa;
+  border: 1px solid #e8dcf1;
+  border-radius: 15px;
+}
+.diet-modes button {
+  justify-content: center;
+  min-height: 40px;
+  min-width: 0;
+  padding: 7px 4px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #715f7d;
+  font-size: 12px;
+  gap: 6px;
+  white-space: nowrap;
+}
+.diet-modes button.active {
+  background: #755195;
+  border-color: #755195;
+  color: #fff;
+  box-shadow: 0 2px 5px #75519524;
+}
+@media (max-width: 350px) {
+  .menu-header { padding-inline: 8px; }
+  .menu-header .search { padding-left: 9px; gap: 6px; }
+  .menu-header .search input::placeholder { font-size: 13px; }
+  .diet-modes button { padding-inline: 2px; gap: 5px; font-size: 11px; }
+}

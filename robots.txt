@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+Disallow: /table-menu.html
+Disallow: /order.html
+Disallow: /orders.html
+Disallow: /*?table=
